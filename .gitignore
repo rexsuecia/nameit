@@ -5,3 +5,4 @@ name.json
 vendor
 config/database-localhost.json
 config/database-prod.json
+composer.phar

@@ -1,7 +1,0 @@
-{
-  "database": "dart.cqlzipfh1ssn.eu-west-1.rds.amazonaws.com",
-  "port": "3306",
-  "schema" : "name",
-  "user" : "nameUser",
-  "password": "XsPyb2ehbZAg"
-}
