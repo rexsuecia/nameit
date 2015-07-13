@@ -1,0 +1,7 @@
+{
+  "database": "HOST",
+  "port": "PORT",
+  "schema" : "SCHEMA",
+  "user" : "USER",
+  "password": "PASSWORD"
+}

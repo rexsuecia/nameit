@@ -1,0 +1,28 @@
+.suggestion {
+    font-weight: bold;
+    width: 80%;
+}
+
+.motivation {
+    font-size: small;
+    padding: 5px;
+    color: #aaa;
+    width: 80%;
+}
+
+.vote {
+    float: right;
+}
+
+.clickable:hover {
+    cursor: pointer;
+}
+
+.hideicon {
+    float: right;
+    padding-right: 10px;
+}
+
+.adjust-google {
+    margin-right: 7px;
+}
