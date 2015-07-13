@@ -1,12 +1,7 @@
 <?php
 function getConnection()
 {
-    if(function_exists("setProxy")) {
-        $configName = "database-localhost.json";
-    } else {
-        $configName = "database-prod.json";
-    }
-    $config = json_decode(file_get_contents("../config/$configName"), true);
+    $config = json_decode(file_get_contents("http://localhost/configuration/name/database.json"), true);
     $connectString = sprintf('mysql:host=%s;port=%s;dbname=%s;charset=utf8', $config["database"], $config["port"], $config["schema"]);
 
     $db = new PDO($connectString, $config["user"], $config["password"]);
