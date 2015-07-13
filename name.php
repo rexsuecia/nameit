@@ -2,7 +2,7 @@
 require 'vendor/autoload.php';
 session_start();
 $client = new Google_Client();
-$client->setAuthConfigFile("name.json");
+$client->setAuthConfigFile("http://localhost/configuration/name/google-credentials.json");
 $client->addScope("https://www.googleapis.com/auth/userinfo.profile");
 $client->addScope("https://www.googleapis.com/auth/userinfo.email");
 $client->setAccessType('offline');
