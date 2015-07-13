@@ -108,6 +108,9 @@ if (isset($_GET['code'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
+    <link rel="shortcut icon" href="/images/favicon.png" type="image/x-icon">
+    <link rel="icon" href="/images/favicon.png" type="image/x-icon">
+
     <link href="./css/3pp/bootstrap.min.css" rel="stylesheet"/>
     <link href="./css/3pp/bootstrap-theme.min.css" rel="stylesheet"/>
     <link href="./css/3pp/font-awesome.min.css" rel="stylesheet"/>
@@ -180,8 +183,8 @@ if (isset($_GET['code'])) {
                 <p><b>Please read instructions carefully!</b></p>
 
                 <h2 class=""
-                    data-ng-click="toogleInstructions()">Instructions
-                <span class="glyphicon clickable hideicon"
+                    data-ng-click="toggleInstructions()">Instructions
+                <span class="glyphicon clickable hideIcon"
                       data-ng-class="{ 'glyphicon-chevron-up' : hideInstructions, 'glyphicon-chevron-down' : !hideInstructions}">
                 </span>
                 </h2>
@@ -206,8 +209,8 @@ if (isset($_GET['code'])) {
 
                             </label>
 
-                    <span class="glyphicon clickable hideicon"
-                          data-ng-click="togglePassphrase()"
+                    <span class="glyphicon clickable hideIcon"
+                          data-ng-click="togglePassPhrase()"
                           data-ng-class="{ 'glyphicon-eye-open' : showPass == 'password', 'glyphicon-eye-close' : showPass == 'text'}">
                     </span>
 
@@ -221,7 +224,7 @@ if (isset($_GET['code'])) {
                         <div class="form-group has-feedback">
                             <button type="button" class="btn btn-default"
                                     data-ng-class="{'disabled' : ! passForm.$valid || !passForm.$dirty }"
-                                    data-ng-click="saveCookie()">
+                                    data-ng-click="savePassPhrase()">
                                 Save
                             </button>
                         </div>
@@ -304,10 +307,8 @@ if (isset($_GET['code'])) {
     </div>
 </div>
 
-<script src="http://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/aes.js"></script>
+<script src="javascript/3pp/aes.js"></script>
 <script src="javascript/3pp/angular.min.js"></script>
-<script src="javascript/3pp/angular-route.min.js"></script>
-<script src="javascript/3pp/angular-cookies.min.js"></script>
 <script src="javascript/3pp/jquery-1.11.2.min.js"></script>
 <script src="javascript/3pp/bootstrap.min.js"></script>
 <script src="javascript/3pp/ui-bootstrap-tpls-0.13.0.min.js"></script>

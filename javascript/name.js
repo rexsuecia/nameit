@@ -1,4 +1,4 @@
-var nameApp = angular.module('nameApp', ['ngRoute', 'ui.bootstrap', 'ngCookies'])
+var nameApp = angular.module('nameApp', ['ui.bootstrap'])
     .service('dataService', ['$http', function ($http) {
 
         var suggestions = [],
@@ -83,30 +83,28 @@ var nameApp = angular.module('nameApp', ['ngRoute', 'ui.bootstrap', 'ngCookies']
         };
     }]).
     controller('nameController',
-    ['$scope', '$cookies', 'dataService', 'userService',
-        function ($scope, $cookies, dataService, userService) {
-            var encrypted = CryptoJS.AES.encrypt("A much longer string perhaps long enough", "Secret Passphrase");
-            var decrypted = CryptoJS.AES.decrypt(encrypted, "Secret Passphrase");
-            console.log(decrypted.toString(CryptoJS.enc.Utf8));
+    ['$scope',  'dataService', 'userService',
+        function ($scope, dataService, userService) {
+            //console.log(decrypted.toString(CryptoJS.enc.Utf8));
 
             $scope.canVote = userService.canVote;
 
             $scope.suggestions = dataService.suggestions;
             $scope.showPass = "password";
-            $scope.togglePassphrase = function () {
+            $scope.togglePassPhrase = function () {
                 $scope.showPass = $scope.showPass == "text" ? "password" : "text";
             };
 
-            $scope.hideInstructions = $cookies.hideInstructions === "true";
+            $scope.hideInstructions = localStorage.getItem("hideInstructions") === "true";
 
-            $scope.toogleInstructions = function () {
+            $scope.toggleInstructions = function () {
                 $scope.hideInstructions = $scope.hideInstructions ? false : true;
-                $cookies.hideInstructions = $scope.hideInstructions;
+                localStorage.setItem("hideInstructions", $scope.hideInstructions);
             };
 
-            $scope.passphrase = $cookies.passphrase;
-            $scope.saveCookie = function () {
-                $cookies.passphrase = $scope.passphrase;
+            $scope.passphrase = localStorage.getItem("passPhrase");
+            $scope.savePassPhrase = function () {
+                localStorage.setItem("passPhrase",$scope.passphrase);
                 $scope.passForm.$setPristine();
             };
 
@@ -118,7 +116,7 @@ var nameApp = angular.module('nameApp', ['ngRoute', 'ui.bootstrap', 'ngCookies']
                         suggestion: $scope.suggestion,
                         verification: encrypted.toString(),
                         motivation: $scope.motivation
-                    }
+                    };
                 console.log(encrypted.toString());
                 dataService.submit(suggestion, function (result) {
                     console.log(result); //TODO: Handle error.
