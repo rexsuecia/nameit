@@ -1,18 +1,20 @@
+/* Start with some initialization of Bootstrap */
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+});
+
 var nameApp = angular.module('nameApp', ['ui.bootstrap'])
     .service('dataService', ['$http', function ($http) {
 
         var suggestions = [],
             votes = [],
-            submit = function (suggestion, callback) {
+            submit = function (suggestion) {
                 var config = {
                     method: "get",
                     url: "php/name.php",
                     params: suggestion
                 };
-                $http(config).success(function (data, status, headers, config) {
-                    console.log(data, status, headers, config);
-                    callback(data);
-                });
+                return $http(config);
             }, getSuggestions = function (passPhrase, email) {
                 var config = {
                     method: "get",
@@ -37,7 +39,6 @@ var nameApp = angular.module('nameApp', ['ui.bootstrap'])
                         suggestions.push(suggestion);
                     }
                     getVotes(email);
-
                 });
             }, vote = function (id) {
                 var config = {
@@ -83,14 +84,16 @@ var nameApp = angular.module('nameApp', ['ui.bootstrap'])
         };
     }]).
     controller('nameController',
-    ['$scope',  'dataService', 'userService',
-        function ($scope, dataService, userService) {
+    ['$scope', 'dataService', 'userService', 'alertService',
+        function ($scope, dataService, userService, alertService) {
             //console.log(decrypted.toString(CryptoJS.enc.Utf8));
 
             $scope.canVote = userService.canVote;
+            $scope.userId = userService.userId;
 
             $scope.suggestions = dataService.suggestions;
             $scope.showPass = "password";
+
             $scope.togglePassPhrase = function () {
                 $scope.showPass = $scope.showPass == "text" ? "password" : "text";
             };
@@ -104,23 +107,26 @@ var nameApp = angular.module('nameApp', ['ui.bootstrap'])
 
             $scope.passphrase = localStorage.getItem("passPhrase");
             $scope.savePassPhrase = function () {
-                localStorage.setItem("passPhrase",$scope.passphrase);
+                localStorage.setItem("passPhrase", $scope.passphrase);
                 $scope.passForm.$setPristine();
             };
 
             $scope.submitSuggestion = function () {
-                console.log($scope.passphrase);
-                console.log($scope.suggestion);
                 var encrypted = CryptoJS.AES.encrypt($scope.suggestion, $scope.passphrase),
                     suggestion = {
                         suggestion: $scope.suggestion,
                         verification: encrypted.toString(),
                         motivation: $scope.motivation
                     };
-                console.log(encrypted.toString());
-                dataService.submit(suggestion, function (result) {
-                    console.log(result); //TODO: Handle error.
+                dataService.submit(suggestion).then(function (result) {
+                    console.log(result.data.result.error);
+                    if(result.data.result.error === false ) {
+                        alertService.showAlert('Submission successful. Dismiss to view.', "success", "S" + (result.data.result.id -1));
+                    } else {
+                        alertService.showAlert("Submission failed, message from server: " + result.data.result.message, "danger");
+                    }
                     dataService.getSuggestions($scope.passphrase);
+
                 })
             };
 
@@ -136,6 +142,7 @@ var nameApp = angular.module('nameApp', ['ui.bootstrap'])
         }]).controller('LoginController', ['$scope', 'userService',
         function ($scope, userService) {
             $scope.loggedIn = userService.userId != '';
+            $scope.email = userService.userId;
 
             $scope.login = function () {
                 window.location = './name.php?login';
@@ -144,6 +151,49 @@ var nameApp = angular.module('nameApp', ['ui.bootstrap'])
             $scope.disconnect = function () {
                 window.location = './?logout';
             };
+        }]).service('alertService', [
+        function () {
+            var alert = {},
+                showAlert = function (message, type, position) {
+                    alert.message = message;
+                    alert.type = type;
+                    alert.show = true;
+                    if(position) {
+                        alert.position = position;
+                    }
+                };
+
+            return {
+                showAlert: showAlert,
+                alert: alert
+
+            };
+        }]).controller('NameAlertController', ['$scope', 'alertService', '$anchorScroll', '$timeout',
+        function ($scope, alertService, $anchorScroll, $timeout) {
+            var timerRunning = false,
+                timer = undefined;
+            $scope.alert = alertService.alert;
+            $scope.closeAlert = function () {
+                $scope.alert.show = false;
+                if($scope.alert.position) {
+                    $anchorScroll($scope.alert.position);
+                }
+            };
+            $scope.$watch(function() {
+                return $scope.alert.show;
+            },function() {
+                if($scope.alert && $scope.alert.show == true && timerRunning == false) {
+                    timerRunning = true;
+                    timer = $timeout(function() {
+                        timerRunning = false;
+                        $scope.alert.show = false;
+                    }, 5000);
+                } else if(timer !== undefined && timerRunning == true) {
+                    console.log("Timeout result: " + $timeout.cancel(timer));
+                    timer = undefined;
+                }
+                console.log("Alert is: " + $scope.alert.show );
+            })
         }]);
 
 

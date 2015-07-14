@@ -14,14 +14,14 @@ function addSuggestion($suggestion, $validation, $motivation)
     $db = getConnection();
     $stmt = $db->prepare($query);
     try {
-
         $stmt->execute(array($suggestion, $validation, $motivation));
+        $id = $db->lastInsertId();
     } catch (PDOException $ex) {
         //echo "An Error occurred!"; //user friendly message
         //echo $ex->getMessage();
         return array("error" => $ex->getMessage());
     }
-    return array("error" => false);
+    return array("error" => false, "id" => $id);
 }
 
 function getSuggestions()

@@ -26,3 +26,15 @@
 .adjust-google {
     margin-right: 7px;
 }
+
+.alertMessage {
+    margin-top: 40px;
+}
+.loginMessage {
+    color: red;
+    font-weight: bold;
+}
+
+.loginMessage:hover {
+    cursor: pointer;
+}

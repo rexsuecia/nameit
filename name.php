@@ -87,8 +87,9 @@ if (isset($_GET['code'])) {
     error_log($_SERVER["REQUEST_SCHEME"] . '://' . $_SERVER['HTTP_HOST']);
     try {
         $client->authenticate($_GET['code']);
-    } catch(Exception  $e) {
-        var_dump($e); die;
+    } catch (Exception  $e) {
+        var_dump($e);
+        die;
     }
 
 
@@ -125,7 +126,7 @@ if (isset($_GET['code'])) {
     <link rel="stylesheet" href="/css/name.css">
 
     <!-- endinject -->
-    <title>Name competition (&alpha;)</title>
+    <title>Name competition (&beta;)</title>
 </head>
 <body>
 <nav class="navbar navbar-default navbar-fixed-top navbar-inverse">
@@ -138,7 +139,7 @@ if (isset($_GET['code'])) {
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#home">DITS Name competition (&alpha;)</a>
+            <a class="navbar-brand" href="#home">DITS Name competition (&beta;)</a>
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
@@ -172,14 +173,25 @@ if (isset($_GET['code'])) {
             </div>
         </div>
     </div>
+    <div class="alertMessage containter" data-ng-controller="NameAlertController">
+        <div class="row" data-ng-show="alert.show">
+            <div class="col-md-3"></div>
+            <div class="col-xs-12 col-md-6">
+                <alert close='closeAlert()' type="{{alert.type}}">{{alert.message}}</alert>
+            </div>
+        </div>
+    </div>
     <div data-ng-controller="nameController">
         <div class="row">
             <div class="col-md-3"></div>
-            <div class="col-xs-12 col-md-6">
-                <h1>DITS name competition (&alpha;)</h1>
 
-                <p>This is a competition to select a name for DITS. Anyone can suggest but only board members (with spouses) can
+            <div class="col-xs-12 col-md-6">
+                <h1>DITS name competition (&beta;)</h1>
+
+                <p>This is a competition to select a name for DITS. Anyone can suggest but only board members (with
+                    spouses) can
                     vote.</p>
+
                 <p><b>Please read instructions carefully!</b></p>
 
                 <h2 class=""
@@ -191,12 +203,16 @@ if (isset($_GET['code'])) {
 
                 <div data-ng-show="!hideInstructions">
                     <ol>
-                        <li>Select a pass phrase, about 10 or twenty characters, what ever you like but please remember
+                        <li>Select a pass phrase, about 10 or twenty characters, what ever you like but please
+                            remember
                             it. It will be used to verify that it is you who made the suggestion. Keep it a secret.
                         </li>
-                        <li>Enter a suggestion, this will be stored together with the encrypted (AES-256) version, encrypted
-                        with you pass phrase, a pass phrase that only you should know.</li>
-                        <li>Check back in later and vote, you can vote for as many as you want, but you can only cast
+                        <li>Enter a suggestion, this will be stored together with the encrypted (AES-256) version,
+                            encrypted
+                            with you pass phrase, a pass phrase that only you should know.
+                        </li>
+                        <li>Check back in later and vote, you can vote for as many as you want, but you can only
+                            cast
                             one vote per suggestion
                         </li>
                         <li>You will currently need to reload the page to see changes from other users.
@@ -270,58 +286,80 @@ if (isset($_GET['code'])) {
                 </form>
                 <h2>Suggestions</h2>
 
-                <div id="suggestions list-goup">
-
-                    <div class="row suggestionItem list-group-item list-group-item-info"
-                    ">
-                    <div class="col-xs-10 col-md-10">
-                        <div class="suggestion">
-                            Name Suggestion
-                        </div>
-                        <div class="motivation">Motivation</div>
+                <div class="row" data-ng-show="!loggedIn || !canVote" data-ng-controller="LoginController">
+                    <div class="col-md-2"></div>
+                    <div class="row-xs-12 col-md-6 loginMessage"
+                         data-ng-show="!loggedIn"
+                         data-ng-click="login()">
+                        <p>Log in to vote!</p>
                     </div>
-                    <div class="vote col-xs-2 col-md-2">
-                        <div class="vote glyphicon glyphicon-thumbs-up clickable"
-                             data-ng-click="vote(suggestion.id)"></div>
-                        <div class="votecount">#</div>
+                    <div class="row-xs-12 col-md-8 loginMessage"
+                         data-ng-show="loggedIn && !canVote">
+                        <p>User {{email}} cannot vote!</p>
                     </div>
                 </div>
-                <div class="row suggestionItem list-group-item" data-ng-repeat="suggestion in suggestions | orderBy: 'voteCount': 'reverse'"
-                     data-ng-class="{'list-group-item-warning' : suggestion.userSuggestion}">
-                    <div class="col-xs-10 col-md-10">
-                        <div class="suggestion">
-                            {{suggestion.suggestion}}
+                <div id="suggestions list-goup">
+
+                    <div class="row suggestionItem list-group-item list-group-item-info">
+                        <div class="col-xs-10 col-md-10">
+                            <div class="suggestion">
+                                Name Suggestion
+                            </div>
+                            <div class="motivation">Motivation</div>
                         </div>
-                        <div class="motivation" data-ng-show="suggestion.motivation">{{suggestion.motivation}}</div>
-                        <div class="motivation" data-ng-show="!suggestion.motivation">Motivation not provided</div>
+                        <div class="vote col-xs-2 col-md-2">
+                            <div class="vote glyphicon glyphicon-thumbs-up"
+                                 data-toggle="tooltip"
+                                 data-placement="left"
+                                 title="Click to vote or unvote"></div>
+                            <div
+                                data-toggle="tooltip"
+                                data-placement="left"
+                                title="Number of votes received"
+                                class="">#
+                            </div>
+                        </div>
                     </div>
-                    <div class="vote col-xs-2 col-md-2">
-                        <div class="vote glyphicon clickable"
-                             data-ng-class="{'glyphicon-thumbs-up' : !suggestion.voted, 'glyphicon-thumbs-down' : suggestion.voted }"
-                             data-ng-click="vote(suggestion.id)"></div>
-                        <div class="votecount">{{suggestion.voteCount}}</div>
+                    <div class="row suggestionItem list-group-item"
+                         data-ng-repeat="suggestion in suggestions | orderBy: 'voteCount': 'reverse'"
+                         data-ng-class="{'list-group-item-warning' : suggestion.userSuggestion}"
+                         id="S{{suggestion.id}}">
+                        <div class=" col-xs-10col-md-10">
+                            <div class="suggestion">
+                                {{suggestion.suggestion}}
+                            </div>
+                            <div class="motivation" data-ng-show="suggestion.motivation">{{suggestion.motivation}}</div>
+                            <div class="motivation" data-ng-show="!suggestion.motivation">Motivation not provided</div>
+                        </div>
+                        <div class="vote col-xs-2 col-md-2">
+                            <div class="vote glyphicon clickable"
+                                 data-ng-show="canVote"
+                                 data-ng-class="{'glyphicon-thumbs-up' : !suggestion.voted, 'glyphicon-thumbs-down' : suggestion.voted }"
+                                 data-ng-click="vote(suggestion.id)"></div>
+                            <div class="votecount">{{suggestion.voteCount}}</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<script src="javascript/3pp/aes.js"></script>
-<script src="javascript/3pp/angular.min.js"></script>
-<script src="javascript/3pp/jquery-1.11.2.min.js"></script>
-<script src="javascript/3pp/bootstrap.min.js"></script>
-<script src="javascript/3pp/ui-bootstrap-tpls-0.13.0.min.js"></script>
-<script src="javascript/name.js"></script>
-<script>
-    var userService = nameApp.service('userService', function () {
-        var userId = "<?php echo isset( $_SESSION['token_data']) ? $_SESSION["token_data"]["payload"]["email"] : ''?>",
-            canVote = <?php echo isset( $_SESSION['canVote']) ? $_SESSION['canVote'] : "false" ?>;
-        return {
-            userId: userId,
-            canVote: canVote
-        }
-    });
-</script>
+    <script src="javascript/3pp/aes.js"></script>
+    <script src="javascript/3pp/angular.min.js"></script>
+    <script src="javascript/3pp/jquery-1.11.2.min.js"></script>
+    <script src="javascript/3pp/angular-sanitize.min.js"></script>
+    <script src="javascript/3pp/bootstrap.min.js"></script>
+    <script src="javascript/3pp/ui-bootstrap-tpls-0.13.0.min.js"></script>
+    <script src="javascript/name.js"></script>
+    <script>
+        var userService = nameApp.service('userService', function () {
+            var userId = "<?php echo isset( $_SESSION['token_data']) ? $_SESSION["token_data"]["payload"]["email"] : ''?>",
+                canVote = <?php echo isset( $_SESSION['canVote']) ? $_SESSION['canVote'] : "false" ?>;
+            return {
+                userId: userId,
+                canVote: canVote
+            }
+        });
+    </script>
 </body>
 </html>
