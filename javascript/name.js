@@ -122,6 +122,10 @@ var nameApp = angular.module('nameApp', ['ui.bootstrap'])
                     console.log(result.data.result.error);
                     if(result.data.result.error === false ) {
                         alertService.showAlert('Submission successful. Dismiss to view.', "success", "S" + (result.data.result.id -1));
+                        $scope.suggestion = null;
+                        $scope.motivation = null;
+                        $scope.suggestionForm.$setPristine();
+
                     } else {
                         alertService.showAlert("Submission failed, message from server: " + result.data.result.message, "danger");
                     }
